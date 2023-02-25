@@ -10,10 +10,14 @@ import org.springframework.data.mongodb.core.aggregation.AggregationOptions;
 import org.springframework.data.mongodb.core.aggregation.ArrayOperators.In;
 import org.springframework.data.mongodb.core.aggregation.BooleanOperators.And;
 import org.springframework.data.mongodb.core.aggregation.EvaluationOperators.EvaluationOperatorFactory.Expr;
+import org.springframework.data.mongodb.core.aggregation.Fields;
+import org.springframework.data.mongodb.core.aggregation.GroupOperation;
 import org.springframework.data.mongodb.core.aggregation.MatchOperation;
+import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import lombok.RequiredArgsConstructor;
+import prv.ferchichi.daftar.api.filminfo.DirectorDTO;
 import reactor.core.publisher.Flux;
 
 @RequiredArgsConstructor
@@ -52,6 +56,19 @@ public class CustomArticleRepositoryImpl implements CustomArticleRepository {
 		return aggregate(operations);
 	}
 
+	public Flux<DirectorDTO> findAllDirectors() {
+		List<AggregationOperation> operations = new ArrayList<>();
+		GroupOperation group = new GroupOperation(Fields.from(Fields.field("name", "filmInfos.director")));
+		ProjectionOperation project = new ProjectionOperation(Fields.from(Fields.field("name", "_id")));
+		operations.addAll(List.of(group, project));
+		return aggregate(operations, DirectorDTO.class);
+	}
+	
+	public Flux<FilmInfoDTO> findFilmInfos() {
+		List<AggregationOperation> operations = new ArrayList<>();
+		return Flux.empty();
+	}
+	
 	private Criteria conditionalIn(Criteria criteria, String fieldName, String member) {
 		if (member != null && !member.isBlank()) {
 			return criteria.and(fieldName).regex(".*" + member + ".*", "i");
@@ -77,10 +94,14 @@ public class CustomArticleRepositoryImpl implements CustomArticleRepository {
 	}
 
 	private Flux<ArticleDocument> aggregate(List<AggregationOperation> operations) {
+		return aggregate(operations, ArticleDocument.class);
+	}
+
+	private <T> Flux<T> aggregate(List<AggregationOperation> operations, Class<T> clazz) {
 		return template.aggregate(
 				Aggregation.newAggregation(operations)
 						.withOptions(AggregationOptions.builder().allowDiskUse(true).build()),
-				ArticleDocument.class, ArticleDocument.class);
+				ArticleDocument.class, clazz);
 	}
-
+	
 }
