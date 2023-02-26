@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.aggregation.Fields;
 import org.springframework.data.mongodb.core.aggregation.GroupOperation;
 import org.springframework.data.mongodb.core.aggregation.MatchOperation;
 import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
+import org.springframework.data.mongodb.core.aggregation.UnwindOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import lombok.RequiredArgsConstructor;
@@ -58,9 +59,10 @@ public class CustomArticleRepositoryImpl implements CustomArticleRepository {
 
 	public Flux<DirectorDTO> findAllDirectors() {
 		List<AggregationOperation> operations = new ArrayList<>();
+		UnwindOperation unwind = new UnwindOperation(Fields.field("filmInfos.director"));
 		GroupOperation group = new GroupOperation(Fields.from(Fields.field("name", "filmInfos.director")));
 		ProjectionOperation project = new ProjectionOperation(Fields.from(Fields.field("name", "_id")));
-		operations.addAll(List.of(group, project));
+		operations.addAll(List.of(unwind, group, project));
 		return aggregate(operations, DirectorDTO.class);
 	}
 	

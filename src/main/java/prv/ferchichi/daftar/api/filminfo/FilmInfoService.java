@@ -16,4 +16,8 @@ public class FilmInfoService {
 	public Flux<FilmInfoDTO> getAll() {
 		return repository.findFilmInfos();
 	}
+	
+	public Flux<String> getDirectors() {
+		return repository.findAllDirectors().map(DirectorDTO::getName);
+	}
 }
