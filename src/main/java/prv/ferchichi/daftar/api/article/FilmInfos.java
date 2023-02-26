@@ -10,8 +10,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class FilmInfos {
-	private String title;
-	private String director;
+	private List<String> title;
 	private Short year;
+	private List<String> director;
 	private List<String> stars;
 }

@@ -27,20 +27,19 @@ public class ArticleService {
 	public Flux<ArticleOverviewDTO> getArticleOverviews(String genre) {
 		return ((genre == null ||  "".equals(genre)) ? 
 				repository.findAll() :
-					repository.findAllByTagsContainsIgnoreCase(genre))
-				.map(document -> new ArticleOverviewDTO(document.getId(), document.getArticleTitle(), document.getFilmInfos().getTitle(), document.getPoster()))
-				;
+				repository.findAllByTagsContainsIgnoreCase(genre))
+					.map(ArticleOverviewDTO::new);
 	}
 	
 	public Mono<ArticleInfoDTO> getArticleById(String id) {
-		return repository.findById(id)
-				.map(document -> 
-					new ArticleInfoDTO(id, new FilmInfoDTO(document.getFilmInfos().getTitle(), document.getFilmInfos().getDirector(), document.getFilmInfos().getYear(), document.getFilmInfos().getStars()), document.getFilmSummary(), document.getArticleDate(), document.getTags(), document.getText(), document.getArticleTitle(), document.getCover()));
+		return repository
+				.findById(id)
+				.map(ArticleInfoDTO::new);
 	}
 
 	public Flux<ArticleOverviewDTO> getArticleOverviews(ArticleSearchFilter filter) {
 		return repository.search(filter.getFilmTitle(), filter.getDirector(), filter.getYear(), filter.getCategory(), filter.getCountry(), filter.getStarring())
-				.map(document -> new ArticleOverviewDTO(document.getId(), document.getArticleTitle(), document.getFilmInfos().getTitle(), document.getPoster()));
+				.map(ArticleOverviewDTO::new);
 	}
 
 	

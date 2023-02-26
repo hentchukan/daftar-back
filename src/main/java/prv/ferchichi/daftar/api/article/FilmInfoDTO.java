@@ -6,8 +6,9 @@ import lombok.Value;
 
 @Value
 public class FilmInfoDTO {
-	String title;
-	String director;
+	List<String> title;
 	Short year;
+	List<String> directors;
 	List<String> stars;
+	List<String> genres;
 }
