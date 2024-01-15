@@ -8,6 +8,7 @@ import org.springframework.lang.NonNull;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Value;
+import prv.ferchichi.daftar.api.filminfo.FilmInfoDTO;
 
 @Value
 public class ArticleInfoDTO {
@@ -29,12 +30,22 @@ public class ArticleInfoDTO {
 				document.getFilmInfos().getYear(), 
 				document.getFilmInfos().getDirector(), 
 				document.getFilmInfos().getStars(),
-				null);
+				extractGenres(document.getTags()),
+				extractCountries(document.getTags()));
 		this.summary = document.getFilmSummary(); 
 		this.date = document.getArticleDate(); 
 		this.tags = document.getTags();
 		this.text = document.getText(); 
 		this.articleTitle = document.getArticleTitle(); 
 		this.cover = document.getCover();
+	}
+
+	private List<String> extractCountries(Set<String> tags) {
+		return tags.stream().toList();
+	}
+
+	private List<String> extractGenres(Set<String> tags) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

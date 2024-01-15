@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import prv.ferchichi.daftar.api.article.ArticleRepository;
-import prv.ferchichi.daftar.api.article.FilmInfoDTO;
 import reactor.core.publisher.Flux;
 
 @Service
@@ -17,7 +16,11 @@ public class FilmInfoService {
 		return repository.findFilmInfos();
 	}
 	
-	public Flux<String> getDirectors() {
-		return repository.findAllDirectors().map(DirectorDTO::getName);
+	public Flux<DirectorDTO> getDirectors() {
+		return repository.findAllDirectors();
+	}
+	
+	public Flux<StarDTO> getStars() {
+		return repository.findAllStars();
 	}
 }

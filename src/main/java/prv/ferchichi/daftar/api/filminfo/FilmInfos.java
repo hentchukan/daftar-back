@@ -1,4 +1,4 @@
-package prv.ferchichi.daftar.api.article;
+package prv.ferchichi.daftar.api.filminfo;
 
 import java.util.List;
 
