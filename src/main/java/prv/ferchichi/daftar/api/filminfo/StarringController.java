@@ -9,16 +9,16 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 
 @RestController
-@RequestMapping("/v1/directors")
+@RequestMapping("/v1/starring")
 @RequiredArgsConstructor
-public class DirectorController {
+public class StarringController {
 
-	private final DirectorService directorService;
+	private final FilmInfoService filmInfoService;
 	
 	@CrossOrigin(origins = "http://localhost:8080")
 	@GetMapping()
-	public Flux<DirectorDTO> getDirectors() {
-		return directorService.getDirectors();
+	public Flux<StarDTO> getStars() {
+		return filmInfoService.getStars();
 	}
 	
 }

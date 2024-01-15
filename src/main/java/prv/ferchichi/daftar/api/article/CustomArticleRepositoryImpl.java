@@ -19,6 +19,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 
 import lombok.RequiredArgsConstructor;
 import prv.ferchichi.daftar.api.filminfo.DirectorDTO;
+import prv.ferchichi.daftar.api.filminfo.FilmInfoDTO;
+import prv.ferchichi.daftar.api.filminfo.StarDTO;
 import reactor.core.publisher.Flux;
 
 @RequiredArgsConstructor
@@ -66,8 +68,18 @@ public class CustomArticleRepositoryImpl implements CustomArticleRepository {
 		return aggregate(operations, DirectorDTO.class);
 	}
 	
-	public Flux<FilmInfoDTO> findFilmInfos() {
+	@Override
+	public Flux<StarDTO> findAllStars() {
 		List<AggregationOperation> operations = new ArrayList<>();
+		UnwindOperation unwind = new UnwindOperation(Fields.field("filmInfos.stars"));
+		GroupOperation group = new GroupOperation(Fields.from(Fields.field("name", "filmInfos.stars")));
+		ProjectionOperation project = new ProjectionOperation(Fields.from(Fields.field("name", "_id")));
+		operations.addAll(List.of(unwind, group, project));
+		return aggregate(operations, StarDTO.class);
+	}
+	
+	public Flux<FilmInfoDTO> findFilmInfos() {
+//		List<AggregationOperation> operations = new ArrayList<>();
 		return Flux.empty();
 	}
 	

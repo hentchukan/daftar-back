@@ -33,6 +33,12 @@ public class ArticleController {
 	}
 	
 	@CrossOrigin(origins = "http://localhost:8080")
+	@PostMapping("")
+	public Mono<Void> setArticles(@RequestBody ArticleDTO article) {
+		return articleService.createArticle(article);
+	}
+	
+	@CrossOrigin(origins = "http://localhost:8080")
 	@PostMapping("/overviews")
 	public Flux<ArticleOverviewDTO> getArticles(@RequestBody ArticleSearchFilter filter) {
 		return articleService.getArticleOverviews(filter);

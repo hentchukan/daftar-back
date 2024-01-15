@@ -12,4 +12,5 @@ public interface ArticleRepository extends ReactiveMongoRepository<ArticleDocume
 	Flux<ArticleDocument> findAll();
 	Mono<ArticleDocument> findById(String id);
 	Flux<ArticleDocument> findAllByTagsContainsIgnoreCase(String genre);
+	
 }

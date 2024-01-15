@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import prv.ferchichi.daftar.api.article.FilmInfoDTO;
 import reactor.core.publisher.Flux;
 
 @RestController

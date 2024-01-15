@@ -1,11 +1,14 @@
 package prv.ferchichi.daftar.api.article;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import prv.ferchichi.daftar.api.tag.TagDocument;
+import prv.ferchichi.daftar.api.tag.TagService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -14,6 +17,7 @@ import reactor.core.publisher.Mono;
 public class ArticleService {
 
 	private final ArticleRepository repository;
+	private final TagService tagService;
 	
 	List<ArticleOverviewDTO> articles = List.of(
 			new ArticleOverviewDTO(UUID.fromString("dfaca0fe-a594-44d0-8b37-e571adaee1ba"), "من فضلك اِلمس غدي!", "Lunana, A Yak in the classroom", "https://storage.cloud.google.com/daftar-articles/lunana.jpg"),
@@ -42,5 +46,25 @@ public class ArticleService {
 				.map(ArticleOverviewDTO::new);
 	}
 
+	public Mono<Void> createArticle(ArticleDTO article) {
+		List<TagDocument> tags = new ArrayList<>(); 
+				
+		article.getFilmInfo()
+			.getGenres()
+			.stream()
+			.map(genre -> new TagDocument(genre, "Genre", new ArrayList<String>(List.of(genre))))
+			.forEach(tag -> tags.add(tag));
+		
+		article.getFilmInfo()
+			.getCountries()
+			.stream()
+			.map(country -> new TagDocument(country, "Country", List.of(country)))
+			.forEach(tag -> tags.add(tag));
+		
+		return tagService
+				.updateTags(tags)
+				.then(repository.save(new ArticleDocument(article)))
+				.then();
+	}
 	
 }
