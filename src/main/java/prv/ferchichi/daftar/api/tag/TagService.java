@@ -22,7 +22,7 @@ public class TagService {
 	}
 
 	public Flux<TagDTO> getAllTagsByType(String type) {
-		return repository.findAllByType(type)
+		return repository.findAllByTypeIgnoreCase(type)
 				.map(TagDocument::toDTO);
 	}
 

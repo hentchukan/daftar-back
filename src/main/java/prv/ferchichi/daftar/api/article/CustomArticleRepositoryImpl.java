@@ -3,18 +3,12 @@ package prv.ferchichi.daftar.api.article;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mongodb.client.model.Filters;
+import org.bson.Document;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOptions;
+import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.aggregation.ArrayOperators.In;
 import org.springframework.data.mongodb.core.aggregation.BooleanOperators.And;
-import org.springframework.data.mongodb.core.aggregation.EvaluationOperators.EvaluationOperatorFactory.Expr;
-import org.springframework.data.mongodb.core.aggregation.Fields;
-import org.springframework.data.mongodb.core.aggregation.GroupOperation;
-import org.springframework.data.mongodb.core.aggregation.MatchOperation;
-import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
-import org.springframework.data.mongodb.core.aggregation.UnwindOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import lombok.RequiredArgsConstructor;
@@ -34,7 +28,15 @@ public class CustomArticleRepositoryImpl implements CustomArticleRepository {
 
 		Criteria criteria = new Criteria();
 		// Title
-		criteria = conditionalAlike(criteria, "filmInfos.title", title);
+		if (title != null && !title.isBlank()) {
+			title = ".*" + title.replaceAll("([\\u064B-\\u0652])", "") + ".*";
+
+			// MongoDB's $regex operator is used here for pattern matching in a case-insensitive manner ('i' flag)
+			criteria = criteria.andOperator(Criteria.where("filmInfos.title").regex(title, "i"));
+			
+			operations.add(projectForTitleSearch());
+		}
+
 		// Director
 		criteria = conditionalAlike(criteria, "filmInfos.director", director);
 		// Year
@@ -44,37 +46,79 @@ public class CustomArticleRepositoryImpl implements CustomArticleRepository {
 
 		List<In> ins = new ArrayList<>();
 		// Country
-		if (country != null && !"".equals(country)) {
+		if (country != null && !country.isEmpty()) {
 			ins.add(In.arrayOf("tags").containsValue(country));
 		}
 		
 		// Category
-		if (category != null && !"".equals(category)) {
+		if (category != null && !category.isEmpty()) {
 			ins.add(In.arrayOf("tags").containsValue(category));
 		}
 		
-		Expr matchTags = Expr.valueOf(And.and(ins.toArray()));
-		
+		EvaluationOperators.Expr matchTags = EvaluationOperators.Expr.valueOf(And.and(ins.toArray()));
+
 		operations.addAll(List.of(new MatchOperation(criteria), new MatchOperation(matchTags)));
 		return aggregate(operations);
 	}
 
+	private AggregationOperation projectForTitleSearch() {
+		// Example of a custom aggregation stage using raw BSON, adjust according to actual needs
+		Document rawProjectionStage = Document.parse("{"
+				+ "  '$project': {"
+				+ "'filmInfos.title': {" +
+				"    $map: {" +
+				"      input: '$filmInfos.title'," +
+				"      as: 'item'," +
+				"      in: {" +
+				"        $reduce: {" +
+				"                input: {" +
+				"                  $regexFindAll: {" +
+				"                    input: '$$item'," +
+				"                    regex: '[^\\u064B-\\u065F\\u0670\\u06D6-\\u06DC\\u06DF-\\u06E8\\u06EA-\\u06ED]'," +
+				"                    options: ''" +
+				"                  }" +
+				"                }," +
+				"                initialValue: ''," +
+				"                in: { '$concat': ['$$value', '$$this.match'] }" +
+				"              }" +
+				"      }" +
+				"    }" +
+				"  }"
+				+ "    'tags': 1,"
+				+ "    '_id': 1,"
+				+ "    'filmSummary': 1,"
+				+ "    'articleDate': 1,"
+				+ "    'text': 1,"
+				+ "    'articleTitle': 1,"
+				+ "    'cover': 1,"
+				+ "    'poster': 1"
+				+ "  }"
+				+ "}");
+
+		AggregationOperation customProjectionOperation = new AggregationOperation() {
+			@Override
+			public Document toDocument(AggregationOperationContext context) {
+				return rawProjectionStage;
+			}
+		};
+
+		return customProjectionOperation;
+	}
+
 	public Flux<DirectorDTO> findAllDirectors() {
-		List<AggregationOperation> operations = new ArrayList<>();
-		UnwindOperation unwind = new UnwindOperation(Fields.field("filmInfos.director"));
+        UnwindOperation unwind = new UnwindOperation(Fields.field("filmInfos.director"));
 		GroupOperation group = new GroupOperation(Fields.from(Fields.field("name", "filmInfos.director")));
 		ProjectionOperation project = new ProjectionOperation(Fields.from(Fields.field("name", "_id")));
-		operations.addAll(List.of(unwind, group, project));
+        List<AggregationOperation> operations = new ArrayList<>(List.of(unwind, group, project));
 		return aggregate(operations, DirectorDTO.class);
 	}
 	
 	@Override
 	public Flux<StarDTO> findAllStars() {
-		List<AggregationOperation> operations = new ArrayList<>();
-		UnwindOperation unwind = new UnwindOperation(Fields.field("filmInfos.stars"));
+        UnwindOperation unwind = new UnwindOperation(Fields.field("filmInfos.stars"));
 		GroupOperation group = new GroupOperation(Fields.from(Fields.field("name", "filmInfos.stars")));
 		ProjectionOperation project = new ProjectionOperation(Fields.from(Fields.field("name", "_id")));
-		operations.addAll(List.of(unwind, group, project));
+        List<AggregationOperation> operations = new ArrayList<>(List.of(unwind, group, project));
 		return aggregate(operations, StarDTO.class);
 	}
 	

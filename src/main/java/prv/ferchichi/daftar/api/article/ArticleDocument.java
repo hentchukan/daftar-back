@@ -51,6 +51,6 @@ public class ArticleDocument {
 		
 		// TODO cover + poster
 		this.cover = dto.getFilmInfo().getCover();
-		this.poster = dto.getFilmInfo().getPoster();		
+		this.poster = dto.getFilmInfo().getPoster();
 	}
 }

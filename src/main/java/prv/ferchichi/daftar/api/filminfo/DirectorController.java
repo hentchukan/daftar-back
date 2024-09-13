@@ -15,7 +15,7 @@ public class DirectorController {
 
 	private final DirectorService directorService;
 	
-	@CrossOrigin(origins = "http://localhost:8080")
+	// @CrossOrigin(origins = "http://localhost:8080")
 	@GetMapping()
 	public Flux<DirectorDTO> getDirectors() {
 		return directorService.getDirectors();

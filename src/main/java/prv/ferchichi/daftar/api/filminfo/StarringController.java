@@ -15,7 +15,7 @@ public class StarringController {
 
 	private final FilmInfoService filmInfoService;
 	
-	@CrossOrigin(origins = "http://localhost:8080")
+	// @CrossOrigin(origins = "http://localhost:8080")
 	@GetMapping()
 	public Flux<StarDTO> getStars() {
 		return filmInfoService.getStars();

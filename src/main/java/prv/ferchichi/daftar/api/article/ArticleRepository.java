@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 public interface ArticleRepository extends ReactiveMongoRepository<ArticleDocument, UUID>, CustomArticleRepository {
 	
 	Flux<ArticleDocument> findAll();
-	Mono<ArticleDocument> findById(String id);
+	Mono<ArticleDocument> findById(UUID id);
 	Flux<ArticleDocument> findAllByTagsContainsIgnoreCase(String genre);
 	
 }

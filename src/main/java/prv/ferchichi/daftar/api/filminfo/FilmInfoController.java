@@ -15,7 +15,7 @@ public class FilmInfoController {
 
 	private final FilmInfoService filmInfoService;
 	
-	@CrossOrigin(origins = "http://localhost:8080")
+	// @CrossOrigin(origins = "http://localhost:8080")
 	@GetMapping()
 	public Flux<FilmInfoDTO> getFilmInfos() {
 		return filmInfoService.getAll();
