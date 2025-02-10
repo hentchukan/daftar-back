@@ -17,7 +17,7 @@ public class TagController {
 
 private final TagService tagService;
 	
-	@CrossOrigin(origins = "http://localhost:8080")
+	// @CrossOrigin(origins = "http://localhost:8080")
 	@GetMapping("/{tagId}")
 	public Mono<TagDTO> getTag(@PathVariable(name = "tagId", required = true) String id) {
 		return tagService.getTagById(id);
@@ -25,7 +25,7 @@ private final TagService tagService;
 	
 	@CrossOrigin(origins = "http://localhost:8080")
 	@GetMapping("/bytype/{type}")
-	public Flux<TagDTO> getTagsByType(@PathVariable(name = "type", required = true) String type) {
+	public Flux<TagDTO> getTagsByType(@PathVariable(required = true) String type) {
 		return tagService.getAllTagsByType(type);
 	}
 }

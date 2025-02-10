@@ -1,39 +1,40 @@
 package prv.ferchichi.daftar.api.article;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import prv.ferchichi.daftar.api.media.BucketService;
+import prv.ferchichi.daftar.api.tag.TagDocument;
+import prv.ferchichi.daftar.api.tag.TagService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ArticleService {
 
 	private final ArticleRepository repository;
-	
-	List<ArticleOverviewDTO> articles = List.of(
-			new ArticleOverviewDTO(UUID.fromString("dfaca0fe-a594-44d0-8b37-e571adaee1ba"), "من فضلك اِلمس غدي!", "Lunana, A Yak in the classroom", "https://storage.cloud.google.com/daftar-articles/lunana.jpg"),
-			new ArticleOverviewDTO(UUID.fromString("35822b96-69c9-4e9d-b6a1-ded629b940b7"), "اِقطع، لا تقطع!", "Coupez!", "https://storage.googleapis.com/daftar-articles/coupez.webp"),
-			new ArticleOverviewDTO(UUID.fromString("4805d3bc-20dd-487d-9524-0a8891385e75"), "حفلة الذكورة", "Top Gun: Maverick", "https://storage.googleapis.com/daftar-articles/topgunmaverick.jpg"),
-			new ArticleOverviewDTO(UUID.fromString("155bfe14-d248-468b-98c7-8bbf8be54526"), "الذّات والقربان", "قربان", "https://storage.googleapis.com/daftar-articles/communion.jpg"),
-			new ArticleOverviewDTO(UUID.fromString("faff1a3f-a3eb-427e-85e4-83dce4188dd8"), "الخوف من الفانتازيا", "فرططّو الذّهب", "https://storage.googleapis.com/daftar-articles/golden-butterfly.jpeg"),
-			new ArticleOverviewDTO(UUID.fromString("76162b65-c7bb-4eb1-9071-0ca5cd2b946a"), "غدوة، أملا في الأمس", "غدوة", "https://storage.googleapis.com/daftar-articles/ghodwa.jpg")
-			);
+	private final TagService tagService;
+	private final BucketService bucketService;
 	
 	public Flux<ArticleOverviewDTO> getArticleOverviews(String genre) {
 		return ((genre == null ||  "".equals(genre)) ? 
 				repository.findAll() :
 				repository.findAllByTagsContainsIgnoreCase(genre))
-					.map(ArticleOverviewDTO::new);
+					.map(ArticleOverviewDTO::new)
+				;
 	}
 	
 	public Mono<ArticleInfoDTO> getArticleById(String id) {
 		return repository
-				.findById(id)
+				.findById(UUID.fromString(id))
 				.map(ArticleInfoDTO::new);
 	}
 
@@ -42,5 +43,34 @@ public class ArticleService {
 				.map(ArticleOverviewDTO::new);
 	}
 
+	public Mono<Void> createArticle(ArticleDTO article) {
+		List<TagDocument> tags = new ArrayList<>(); 
+				
+		article.getFilmInfo()
+			.getGenres()
+			.stream()
+			.map(genre -> new TagDocument(genre, "Genre", new ArrayList<String>(List.of(genre))))
+			.forEach(tags::add);
+		
+		article.getFilmInfo()
+			.getCountries()
+			.stream()
+			.map(country -> new TagDocument(country, "Country", List.of(country)))
+			.forEach(tags::add);
+
+		return tagService
+				.updateTags(tags)
+				.then(Mono.just(new ArticleDocument(article)))
+				.doOnNext(document -> document.setPoster("https://storage.googleapis.com/"+bucketService.getBucketName()+"/"+document.getPoster()))
+				.doOnNext(document -> document.setCover("https://storage.googleapis.com/"+bucketService.getBucketName()+"/"+document.getCover()))
+				.flatMap(repository::save)
+				.then();
+	}
+
+	public Mono<String> upload(FilePart coverImage, String name, int i) {
+		return bucketService
+				.uploadImage(coverImage, name, i == 0 ? "-poster" : "-cover")
+				.doOnNext(log::info);
+	}
 	
 }

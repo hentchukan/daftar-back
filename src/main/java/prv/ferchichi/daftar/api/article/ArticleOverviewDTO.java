@@ -20,6 +20,6 @@ public class ArticleOverviewDTO {
 		this.title = document.getArticleTitle();
 		this.film = (document.getFilmInfos() != null && document.getFilmInfos().getTitle() != null) ? 
 				document.getFilmInfos().getTitle().get(0) : null;
-		this.img = document.getCover();
+		this.img = document.getPoster();
 	}
 }

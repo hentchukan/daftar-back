@@ -1,0 +1,43 @@
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "daftar-back-deployment"
+  namespace: "default"
+  labels:
+    app: "daftar-back"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "daftar-back-deployment"
+  template:
+    metadata:
+      name: "daftar-back-deployment"
+      labels:
+        app: "daftar-back-deployment"
+    spec:
+      containers:
+        - name: "daftar-back-1"
+          image: "europe-west1-docker.pkg.dev/daftar-360022/daftar-images/daftar-back:0.1.1"
+---
+apiVersion: "autoscaling/v2"
+kind: "HorizontalPodAutoscaler"
+metadata:
+    name: "daftar-back-hpa-z4pu"
+    namespace: "default"
+    labels:
+      app: "daftar-back-deployment"
+spec:
+  scaleTargetRef:
+    kind: "Deployment"
+    name: "daftar-back-deployment"
+    apiVersion: "apps/v1"
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+    - type: "Resource"
+      resource:
+        name: "cpu"
+        target:
+          type: "Utilization"
+          averageUtilization: 80

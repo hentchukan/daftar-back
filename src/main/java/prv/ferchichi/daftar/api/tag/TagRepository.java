@@ -8,6 +8,6 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface TagRepository extends ReactiveMongoRepository<TagDocument, String> {
-	Mono<TagDocument> findById(String id);
-	Flux<TagDocument> findAllByType(String type);
+	Mono<TagDocument> findByIdIgnoreCase(String id);
+	Flux<TagDocument> findAllByTypeIgnoreCase(String type);
 }
