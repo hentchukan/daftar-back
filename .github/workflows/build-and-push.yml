@@ -41,6 +41,18 @@ jobs:
         run: |
           docker build -t ${{ secrets.GAR_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/daftar-images/daftar-back:latest -f devOps/Dockerfile .
 
+
       - name: Push Docker image to Google Artifact Registry
         run: |
-          docker push ${{ secrets.GAR_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/daftar-images/daftar-back:latest
+          docker push ${{ secrets.GAR_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/daftar-images/daftar-back:latest          
+          
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy daftar-back \
+            --image ${{ secrets.GAR_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/daftar-images/daftar-back:latest \
+            --platform managed \
+            --region ${{ secrets.GAR_REGION }} \
+            --allow-unauthenticated \
+            --memory=512Mi \
+            --cpu=1
