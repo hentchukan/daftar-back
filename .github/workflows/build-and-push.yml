@@ -39,23 +39,27 @@ jobs:
       - name: Build JAR with Maven
         run: mvn clean package -DskipTests
 
+      - name: Extract Version from pom.xml
+        run: echo "APP_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
+
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.GAR_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/daftar-images/daftar-back:latest -f devOps/Dockerfile .
-
+          docker build -t ${{ secrets.GAR_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/daftar-images/daftar-back:$APP_VERSION -f devOps/Dockerfile .
+          docker tag ${{ secrets.GAR_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/daftar-images/daftar-back:$APP_VERSION ${{ secrets.GAR_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/daftar-images/daftar-back:$APP_VERSION
 
       - name: Push Docker image to Google Artifact Registry
         run: |
-          docker push ${{ secrets.GAR_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/daftar-images/daftar-back:latest          
-          
+          docker push ${{ secrets.GAR_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/daftar-images/daftar-back:$APP_VERSION          
+          docker push ${{ secrets.GAR_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/daftar-images/daftar-back:latest
 
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy daftar-back \
-            --image ${{ secrets.GAR_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/daftar-images/daftar-back:latest \
+            --image ${{ secrets.GAR_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/daftar-images/daftar-back:$APP_VERSION \
             --platform managed \
             --region ${{ secrets.GAR_REGION }} \
             --allow-unauthenticated \
             --set-env-vars=SPRING_PROFILES_ACTIVE=prod \
             --memory=512Mi \
             --cpu=1
+            --port=8080
