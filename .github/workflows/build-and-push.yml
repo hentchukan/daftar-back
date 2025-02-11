@@ -1,9 +1,11 @@
 name: Build and Push Docker Image to GAR
 
 on:
-  merge_request:
+  pull_request:
     branches:
       - master
+    types:
+      - closed
 
 permissions:
   contents: read
