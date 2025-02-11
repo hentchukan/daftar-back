@@ -49,6 +49,7 @@ jobs:
 
       - name: Build Docker image
         run: |
+          echo "docker build -t ${{ secrets.GAR_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/daftar-images/daftar-back:$APP_VERSION -f devOps/Dockerfile ."
           docker build -t ${{ secrets.GAR_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/daftar-images/daftar-back:$APP_VERSION -f devOps/Dockerfile .
           docker tag ${{ secrets.GAR_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/daftar-images/daftar-back:$APP_VERSION \ 
                               ${{ secrets.GAR_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/daftar-images/daftar-back:latest
