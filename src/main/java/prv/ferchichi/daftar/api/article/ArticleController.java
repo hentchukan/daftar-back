@@ -41,9 +41,16 @@ public class ArticleController {
 			@RequestPart("article") ArticleDTO article,
 			@RequestPart(name = "posterImage", required = false) FilePart posterImage,
 			@RequestPart(name = "coverImage", required = false) FilePart coverImage) {
-		return articleService.upload(posterImage, article.getFilmInfo().getPoster(), 0)
-				.zipWith(articleService.upload(coverImage, article.getFilmInfo().getCover(), 1))
+		return articleService.upload( posterImage, article.getFilmInfo().getPoster())
+				.zipWith(articleService.upload(coverImage, article.getFilmInfo().getCover()))
 				.flatMap(files -> articleService.createArticle(article));
+	}
+
+	@PostMapping(path = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+	public Mono<String> uploadFile(
+			@RequestPart("filename") String filename,
+			@RequestPart(name = "image", required = false) FilePart image) {
+		return articleService.upload(image, filename);
 	}
 	
 	// @CrossOrigin(origins = "http://localhost:8080")
