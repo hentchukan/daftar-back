@@ -25,7 +25,7 @@ public class ArticleService {
 	private final BucketService bucketService;
 	
 	public Flux<ArticleOverviewDTO> getArticleOverviews(String genre) {
-		return ((genre == null ||  "".equals(genre)) ? 
+		return ((genre == null || genre.isEmpty()) ?
 				repository.findAll() :
 				repository.findAllByTagsContainsIgnoreCase(genre))
 					.map(ArticleOverviewDTO::new)
@@ -67,9 +67,9 @@ public class ArticleService {
 				.then();
 	}
 
-	public Mono<String> upload(FilePart coverImage, String name, int i) {
+	public Mono<String> upload(FilePart coverImage, String name) {
 		return bucketService
-				.uploadImage(coverImage, name, i == 0 ? "-poster" : "-cover")
+				.uploadImage(coverImage, name)
 				.doOnNext(log::info);
 	}
 	

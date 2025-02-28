@@ -34,7 +34,7 @@ public class BucketService {
         this.subdirectory = subdirectory;
     }
 
-    public Mono<String> uploadImage(final FilePart image, final String filename, final String suffix) {
+    public Mono<String> uploadImage(final FilePart image, final String filename) {
         return Mono.just(constructBlobId(filename))
             //Create the blobInfo
             .map(bId -> BlobInfo.newBuilder(bId).setContentType("image/jpeg").build())
@@ -49,7 +49,7 @@ public class BucketService {
 
             //Create a Signed "Path Style" URL to access the newly created Blob
             //Set the URL expiry to 10 Minutes
-            .map(blobInfo -> URI.create("https://storage.googleapis.com/"+bucketName+"/"+filename).getPath())
+            .map(blobInfo -> URI.create("https://storage.googleapis.com/"+bucketName+"/"+filename).toString())
             .doOnError(throwable -> log.error(throwable.getMessage()));
     }
 
