@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>prv.ferchichi</groupId>
 	<artifactId>daftar.api</artifactId>
-	<version>0.1.4</version>
+	<version>0.2.0</version>
 	<name>daftar-back</name>
 	<description>Demo project for Spring Boot</description>
 

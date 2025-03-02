@@ -20,6 +20,7 @@ public class ArticleInfoDTO {
 	String date;
 	Set<String> tags;
 	List<String> text;
+	Float rating;
 	String articleTitle;
 	String cover;
 	
@@ -35,7 +36,8 @@ public class ArticleInfoDTO {
 		this.summary = document.getFilmSummary(); 
 		this.date = document.getArticleDate(); 
 		this.tags = document.getTags();
-		this.text = document.getText(); 
+		this.text = document.getText();
+		this.rating = document.getRating();
 		this.articleTitle = document.getArticleTitle(); 
 		this.cover = document.getCover();
 	}

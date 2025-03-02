@@ -2,7 +2,6 @@ package prv.ferchichi.daftar.api.article;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,8 +40,8 @@ public class ArticleController {
 			@RequestPart("article") ArticleDTO article,
 			@RequestPart(name = "posterImage", required = false) FilePart posterImage,
 			@RequestPart(name = "coverImage", required = false) FilePart coverImage) {
-		return articleService.upload( posterImage, article.getFilmInfo().getPoster())
-				.zipWith(articleService.upload(coverImage, article.getFilmInfo().getCover()))
+		return articleService.upload( posterImage, article.filmInfo().getPoster())
+				.zipWith(articleService.upload(coverImage, article.filmInfo().getCover()))
 				.flatMap(files -> articleService.createArticle(article));
 	}
 
