@@ -46,13 +46,13 @@ public class ArticleService {
 	public Mono<Void> createArticle(ArticleDTO article) {
 		List<TagDocument> tags = new ArrayList<>(); 
 				
-		article.getFilmInfo()
+		article.filmInfo()
 			.getGenres()
 			.stream()
 			.map(genre -> new TagDocument(genre, "Genre", new ArrayList<String>(List.of(genre))))
 			.forEach(tags::add);
 		
-		article.getFilmInfo()
+		article.filmInfo()
 			.getCountries()
 			.stream()
 			.map(country -> new TagDocument(country, "Country", List.of(country)))

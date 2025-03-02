@@ -34,23 +34,25 @@ public class ArticleDocument {
 	private String articleTitle;
 	private String cover;
 	private String poster;
+	private float rating;
 	
 	public ArticleDocument(ArticleDTO dto) {
 		
 		this.id = UUID.randomUUID();
 		
-		this.tags = Set.copyOf( Stream.concat(dto.getFilmInfo().getGenres().stream(), dto.getFilmInfo().getCountries().stream()).toList());
+		this.tags = Set.copyOf( Stream.concat(dto.filmInfo().getGenres().stream(), dto.filmInfo().getCountries().stream()).toList());
 		
-		this.text = Arrays.asList(dto.getText().split("\n")).stream().filter(line->!"".equals(line)).toList();
-		this.articleTitle = dto.getTitle();
-		this.filmInfos = new FilmInfos(dto.getFilmInfo().getTitle(), dto.getFilmInfo().getYear(), dto.getFilmInfo().getDirectors(), dto.getFilmInfo().getStars());
+		this.text = Arrays.stream(dto.text().split("\n")).filter(line-> !line.isEmpty()).toList();
+		this.articleTitle = dto.title();
+		this.filmInfos = new FilmInfos(dto.filmInfo().getTitle(), dto.filmInfo().getYear(), dto.filmInfo().getDirectors(), dto.filmInfo().getStars());
 		
 		// TODO articleDate + filmSummary
-		this.filmSummary = dto.getFilmInfo().getFilmSummary();
-		this.articleDate = dto.getArticleDate();
-		
+		this.filmSummary = dto.filmInfo().getFilmSummary();
+		this.articleDate = dto.articleDate();
+		this.rating = dto.rating();
+
 		// TODO cover + poster
-		this.cover = dto.getFilmInfo().getCover();
-		this.poster = dto.getFilmInfo().getPoster();
+		this.cover = dto.filmInfo().getCover();
+		this.poster = dto.filmInfo().getPoster();
 	}
 }
