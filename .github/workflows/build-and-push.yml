@@ -66,6 +66,7 @@ jobs:
             --platform managed \
             --region ${{ secrets.GAR_REGION }} \
             --allow-unauthenticated \
+            --min-instances=1
             --set-env-vars=SPRING_PROFILES_ACTIVE=prod \
             --memory=512Mi \
             --cpu=1 \
