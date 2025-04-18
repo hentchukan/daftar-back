@@ -23,7 +23,7 @@ public class CustomArticleRepositoryImpl implements CustomArticleRepository {
 	private final ReactiveMongoTemplate template;
 
 	public Flux<ArticleDocument> search(String title, String director, Integer year, String category, String country,
-			String starring) {
+			String starring, RatingRange rating) {
 		List<AggregationOperation> operations = new ArrayList<>();
 
 		Criteria criteria = new Criteria();
@@ -43,6 +43,9 @@ public class CustomArticleRepositoryImpl implements CustomArticleRepository {
 		criteria = conditionalEqual(criteria, "filmInfos.year", year);
 		// Starring
 		criteria = conditionalIn(criteria, "filmInfos.stars", starring);
+
+		// Rating from
+		criteria = conditionalRange(criteria, "rating", (rating != null ? rating.from() : null), (rating != null ? rating.to() : null));
 
 		List<In> ins = new ArrayList<>();
 		// Country
@@ -133,6 +136,17 @@ public class CustomArticleRepositoryImpl implements CustomArticleRepository {
 		} else {
 			return criteria;
 		}
+	}
+
+	private Criteria conditionalRange(Criteria criteria, String fieldName, Float from, Float to) {
+		if (from != null && to == null) {
+			return criteria.and(fieldName).gte(from);
+		} else if (from == null && to != null) {
+			criteria = criteria.and(fieldName).lte(to);
+		} else if (from != null) {
+			return criteria.and(fieldName).gte(from).lte(to);
+		}
+		return criteria;
 	}
 
 	private Criteria conditionalAlike(final Criteria criteria, String fieldName, String value) {

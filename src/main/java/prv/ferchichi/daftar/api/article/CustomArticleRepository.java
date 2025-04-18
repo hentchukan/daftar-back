@@ -7,7 +7,7 @@ import reactor.core.publisher.Flux;
 
 public interface CustomArticleRepository {
 
-	Flux<ArticleDocument> search(String title, String director, Integer year, String category, String country, String starring);
+	Flux<ArticleDocument> search(String title, String director, Integer year, String category, String country, String starring, RatingRange rating);
 	Flux<DirectorDTO> findAllDirectors();
 	Flux<FilmInfoDTO> findFilmInfos();
 	Flux<StarDTO> findAllStars();

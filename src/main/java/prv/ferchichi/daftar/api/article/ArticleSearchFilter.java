@@ -10,4 +10,5 @@ public class ArticleSearchFilter {
 	String filmTitle;
 	String director;
 	String starring;
+	RatingRange rating;
 }
