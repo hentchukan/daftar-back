@@ -39,7 +39,7 @@ public class ArticleService {
 	}
 
 	public Flux<ArticleOverviewDTO> getArticleOverviews(ArticleSearchFilter filter) {
-		return repository.search(filter.getFilmTitle(), filter.getDirector(), filter.getYear(), filter.getCategory(), filter.getCountry(), filter.getStarring())
+		return repository.search(filter.getFilmTitle(), filter.getDirector(), filter.getYear(), filter.getCategory(), filter.getCountry(), filter.getStarring(), filter.getRating())
 				.map(ArticleOverviewDTO::new);
 	}
 
