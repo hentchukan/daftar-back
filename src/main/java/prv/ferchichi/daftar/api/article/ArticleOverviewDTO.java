@@ -14,6 +14,7 @@ public class ArticleOverviewDTO {
 	String title;
 	String film;
 	String img;
+	Float rating;
 	
 	public ArticleOverviewDTO(@NonNull ArticleDocument document) {
 		this.id = document.getId();
@@ -21,5 +22,6 @@ public class ArticleOverviewDTO {
 		this.film = (document.getFilmInfos() != null && document.getFilmInfos().getTitle() != null) ? 
 				document.getFilmInfos().getTitle().get(0) : null;
 		this.img = document.getPoster();
+		this.rating = document.getRating();
 	}
 }
