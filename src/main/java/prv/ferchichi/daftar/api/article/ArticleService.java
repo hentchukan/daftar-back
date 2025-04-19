@@ -1,6 +1,7 @@
 package prv.ferchichi.daftar.api.article;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import prv.ferchichi.daftar.api.media.BucketService;
+import prv.ferchichi.daftar.api.tag.TagDTO;
 import prv.ferchichi.daftar.api.tag.TagDocument;
 import prv.ferchichi.daftar.api.tag.TagService;
 import reactor.core.publisher.Flux;
@@ -35,6 +37,15 @@ public class ArticleService {
 	public Mono<ArticleInfoDTO> getArticleById(String id) {
 		return repository
 				.findById(UUID.fromString(id))
+				.flatMap(articleDocument ->
+					tagService.getTagsByIds(articleDocument.getTags())
+							.map(TagDTO::getLabel)
+							.collectList()
+							.map(tags -> {
+								articleDocument.setTags(new HashSet<>(tags));
+								return articleDocument;
+							})
+				)
 				.map(ArticleInfoDTO::new);
 	}
 
