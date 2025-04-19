@@ -3,6 +3,7 @@ package prv.ferchichi.daftar.api.tag;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
@@ -32,6 +33,11 @@ public class TagService {
 				.collectList()
 				.map(toSave::removeAll)
 				.thenMany(repository.saveAll(toSave));
+	}
+
+	public Flux<TagDTO> getTagsByIds(Set<String> tags) {
+		return repository.findAllById(tags)
+				.map(TagDocument::toDTO);
 	}
 	
 }
