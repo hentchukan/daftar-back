@@ -84,7 +84,7 @@ public class ArticleController {
 						  <meta property="og:url" content="https://bluedaftar.com/articles/single-article/%s" />
 						  <meta property="og:type" content="article" />
 		
-						  <meta http-equiv="refresh" content="0; URL=https://bluedaftar.com/articles/single-article/%s" />
+						  <script>window.location.href = "https://bluedaftar.com/articles/single-article/%s"</script>
 						</head>
 						<body>
 						  <p>Redirecting to the article...</p>
