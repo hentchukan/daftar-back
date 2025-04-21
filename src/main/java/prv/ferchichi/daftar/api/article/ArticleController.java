@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/v1/articles")
 @RequiredArgsConstructor
@@ -32,6 +34,11 @@ public class ArticleController {
 	@GetMapping("/overviews")
 	public Flux<ArticleOverviewDTO> getArticleOverviews(@RequestParam(name = "genre", required = false) String genre) {
 		return articleService.getArticleOverviews(genre);
+	}
+
+	@GetMapping("/overviews/{articleId}")
+	public Mono<ArticleOverviewDTO> getArticleOverview(@PathVariable(name = "articleId", required = true) final String articleId) {
+		return articleService.getArticleOverviews(UUID.fromString(articleId));
 	}
 	
 	// @CrossOrigin(origins = "http://localhost:8080")
