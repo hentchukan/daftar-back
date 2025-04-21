@@ -1,6 +1,8 @@
 package prv.ferchichi.daftar.api.article;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -63,5 +65,43 @@ public class ArticleController {
 	@PostMapping("/overviews")
 	public Flux<ArticleOverviewDTO> getArticles(@RequestBody ArticleSearchFilter filter) {
    		return articleService.getArticleOverviews(filter);
+	}
+
+	@GetMapping("/share/{articleId}")
+	public Mono<ResponseEntity<String>> getArticleFacebookShare(@PathVariable(name = "articleId", required = true) final String articleId) {
+		return articleService.getArticleById(articleId)
+				.map(dto -> {
+					String html = """
+						<!DOCTYPE html>
+						<html lang="en">
+						<head>
+						  <meta charset="UTF-8">
+						  <title>الـدّفتـــر الأزرق - %s</title>
+		
+						  <meta property="og:title" content="الـدّفتـــر الأزرق - %s" />
+						  <meta property="og:description" content="%s" />
+						  <meta property="og:image" content="%s" />
+						  <meta property="og:url" content="https://bluedaftar.com/articles/single-article/%s" />
+						  <meta property="og:type" content="article" />
+		
+						  <meta http-equiv="refresh" content="0; URL=https://bluedaftar.com/articles/single-article/%s" />
+						</head>
+						<body>
+						  <p>Redirecting to the article...</p>
+						</body>
+						</html>
+						""".formatted(
+									dto.getArticleTitle(),
+									dto.getArticleTitle(),
+									dto.getSummary(),
+									dto.getCover(),
+									articleId,
+									articleId
+							);
+
+					return ResponseEntity.ok()
+							.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_HTML_VALUE)
+							.body(html);
+				});
 	}
 }
