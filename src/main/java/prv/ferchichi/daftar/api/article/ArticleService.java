@@ -1,10 +1,8 @@
 package prv.ferchichi.daftar.api.article;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
+import lombok.NonNull;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 
@@ -33,20 +31,21 @@ public class ArticleService {
 					.map(ArticleOverviewDTO::new)
 				;
 	}
+
+	public Mono<ArticleOverviewDTO> getArticleOverviews(@NonNull UUID id) {
+		return repository.findById(id).map(ArticleOverviewDTO::new);
+	}
 	
 	public Mono<ArticleInfoDTO> getArticleById(String id) {
 		return repository
 				.findById(UUID.fromString(id))
 				.flatMap(articleDocument ->
 					tagService.getTagsByIds(articleDocument.getTags())
-							.map(TagDTO::getLabel)
+							// .map(TagDTO::getLabel)
 							.collectList()
-							.map(tags -> {
-								articleDocument.setTags(new HashSet<>(tags));
-								return articleDocument;
-							})
+							.zipWith(Mono.just(articleDocument))
 				)
-				.map(ArticleInfoDTO::new);
+				.map(tuple -> new ArticleInfoDTO(tuple.getT2(), tuple.getT1()));
 	}
 
 	public Flux<ArticleOverviewDTO> getArticleOverviews(ArticleSearchFilter filter) {
