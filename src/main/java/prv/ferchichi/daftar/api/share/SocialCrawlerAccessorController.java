@@ -23,10 +23,12 @@ public class SocialCrawlerAccessorController {
         String content = """
                User-agent: twitterbot
                Allow: /v1/articles/share/
+               Allow: /aboutus/share/
     
                User-agent: facebookexternalhit
                Allow: /v1/articles/share/
-    
+               Allow: /aboutus/share/
+
                User-agent: *
                Disallow: /
         """;
