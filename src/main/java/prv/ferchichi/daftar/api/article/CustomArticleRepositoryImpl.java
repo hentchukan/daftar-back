@@ -3,8 +3,8 @@ package prv.ferchichi.daftar.api.article;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mongodb.client.model.Filters;
 import org.bson.Document;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.aggregation.ArrayOperators.In;
@@ -16,6 +16,8 @@ import prv.ferchichi.daftar.api.filminfo.DirectorDTO;
 import prv.ferchichi.daftar.api.filminfo.FilmInfoDTO;
 import prv.ferchichi.daftar.api.filminfo.StarDTO;
 import reactor.core.publisher.Flux;
+
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.sort;
 
 @RequiredArgsConstructor
 public class CustomArticleRepositoryImpl implements CustomArticleRepository {
@@ -60,8 +62,15 @@ public class CustomArticleRepositoryImpl implements CustomArticleRepository {
 		
 		EvaluationOperators.Expr matchTags = EvaluationOperators.Expr.valueOf(And.and(ins.toArray()));
 
-		operations.addAll(List.of(new MatchOperation(criteria), new MatchOperation(matchTags)));
+		SortOperation sort = sort(Sort.by(Sort.Direction.DESC, "articleDate"));
+
+		operations.addAll(List.of(new MatchOperation(criteria), new MatchOperation(matchTags), sort));
 		return aggregate(operations);
+	}
+
+	@Override
+	public Flux<ArticleDocument> search() {
+		return search(null, null, null , null, null, null, null);
 	}
 
 	private AggregationOperation projectForTitleSearch() {
