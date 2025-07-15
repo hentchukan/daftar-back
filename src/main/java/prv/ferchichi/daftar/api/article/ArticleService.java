@@ -26,7 +26,7 @@ public class ArticleService {
 	
 	public Flux<ArticleOverviewDTO> getArticleOverviews(String genre) {
 		return ((genre == null || genre.isEmpty()) ?
-				repository.findAll() :
+				repository.search() :
 				repository.findAllByTagsContainsIgnoreCase(genre))
 					.map(ArticleOverviewDTO::new)
 				;
