@@ -103,18 +103,12 @@ public class CustomArticleRepositoryImpl implements CustomArticleRepository {
 				+ "    'text': 1,"
 				+ "    'articleTitle': 1,"
 				+ "    'cover': 1,"
-				+ "    'poster': 1"
+				+ "    'poster': 1,"
+				+ "    'rating': 1"
 				+ "  }"
 				+ "}");
 
-		AggregationOperation customProjectionOperation = new AggregationOperation() {
-			@Override
-			public Document toDocument(AggregationOperationContext context) {
-				return rawProjectionStage;
-			}
-		};
-
-		return customProjectionOperation;
+		return context -> rawProjectionStage;
 	}
 
 	public Flux<DirectorDTO> findAllDirectors() {
@@ -135,7 +129,6 @@ public class CustomArticleRepositoryImpl implements CustomArticleRepository {
 	}
 	
 	public Flux<FilmInfoDTO> findFilmInfos() {
-//		List<AggregationOperation> operations = new ArrayList<>();
 		return Flux.empty();
 	}
 	
